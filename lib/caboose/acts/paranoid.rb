@@ -54,6 +54,7 @@ module Caboose #:nodoc:
             class << self
               VALID_FIND_OPTIONS << :with_deleted unless VALID_FIND_OPTIONS.include?(:with_deleted)
             end
+            ActiveRecord::Calculations::CALCULATIONS_OPTIONS << :with_deleted unless ActiveRecord::Calculations::CALCULATIONS_OPTIONS.include?(:with_deleted)
             cattr_accessor :deleted_attribute
             self.deleted_attribute = options[:with] || :deleted_at
             alias_method :destroy_without_callbacks!, :destroy_without_callbacks
