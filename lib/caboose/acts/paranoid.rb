@@ -63,6 +63,9 @@ module Caboose #:nodoc:
               alias_method :calculate_with_deleted,     :calculate
               alias_method :delete_all!,                :delete_all
             end
+            if ActiveRecord::Base.respond_to?(:named_scope)
+              named_scope :with_deleted, lambda { |with_deleted| (with_deleted == true) ? { :with_deleted => true } : {} }
+            end
           end
           include InstanceMethods
         end
@@ -117,7 +120,11 @@ module Caboose #:nodoc:
             end
 
             def with_deleted_scope(&block)
-              with_scope({:find => { :conditions => ["#{table_name}.#{deleted_attribute} IS NULL OR #{table_name}.#{deleted_attribute} > ?", current_time] } }, :merge, &block)
+              unless current_scoped_methods.is_a?(Hash) && current_scoped_methods[:find].is_a?(Hash) && current_scoped_methods[:find][:with_deleted] == true
+                with_scope({:find => { :conditions => ["#{table_name}.#{deleted_attribute} IS NULL OR #{table_name}.#{deleted_attribute} > ?", current_time] } }, :merge, &block)
+              else
+                with_scope(&block)
+              end
             end
 
           private
