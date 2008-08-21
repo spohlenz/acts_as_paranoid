@@ -4,9 +4,13 @@ class << ActiveRecord::Base
     returning belongs_to_without_deleted(association_id, options) do
       if with_deleted
         reflection = reflect_on_association(association_id)
-        association_accessor_methods(reflection,            Caboose::Acts::BelongsToWithDeletedAssociation)
-        association_constructor_method(:build,  reflection, Caboose::Acts::BelongsToWithDeletedAssociation)
-        association_constructor_method(:create, reflection, Caboose::Acts::BelongsToWithDeletedAssociation)
+        if reflection.options[:polymorphic]
+          association_accessor_methods(reflection, Caboose::Acts::BelongsToWithDeletedPolymorphicAssociation)
+        else
+          association_accessor_methods(reflection,            Caboose::Acts::BelongsToWithDeletedAssociation)
+          association_constructor_method(:build,  reflection, Caboose::Acts::BelongsToWithDeletedAssociation)
+          association_constructor_method(:create, reflection, Caboose::Acts::BelongsToWithDeletedAssociation)
+        end
       end
     end
   end
