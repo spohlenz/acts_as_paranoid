@@ -51,9 +51,6 @@ module Caboose #:nodoc:
       module ClassMethods
         def acts_as_paranoid(options = {})
           unless paranoid? # don't let AR call this twice
-            class << self
-              VALID_FIND_OPTIONS << :with_deleted unless VALID_FIND_OPTIONS.include?(:with_deleted)
-            end
             cattr_accessor :deleted_attribute
             self.deleted_attribute = options[:with] || :deleted_at
             alias_method :destroy_without_callbacks!, :destroy_without_callbacks
