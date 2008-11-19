@@ -26,6 +26,19 @@ class << ActiveRecord::Base
     end
   end
   
+  def has_one_with_deleted(association_id, options = {})
+    with_deleted = options.delete :with_deleted
+    returning has_one_without_deleted(association_id, options) do
+      if with_deleted
+        reflection = reflect_on_association(association_id)
+        association_accessor_methods(reflection,            Caboose::Acts::HasOneWithDeletedAssociation)
+        association_constructor_method(:build,  reflection, Caboose::Acts::HasOneWithDeletedAssociation)
+        association_constructor_method(:create, reflection, Caboose::Acts::HasOneWithDeletedAssociation)
+      end
+    end
+  end 
+  
+  alias_method_chain :has_one, :deleted
   alias_method_chain :belongs_to, :deleted
   alias_method :has_many_with_deleted, :has_many
   alias_method :has_many, :has_many_without_deleted
